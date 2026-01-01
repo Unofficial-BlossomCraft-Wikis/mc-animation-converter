@@ -7,6 +7,11 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write # Required for Trusted Publishing (OIDC)
+
 jobs:
   release:
     name: Release
@@ -14,25 +19,30 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: 'npm'
+          node-version: 20
+          cache: 'pnpm'
+          # This registry-url is necessary for OIDC to work
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install Dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
-      - name: Create Release Pull Request or Publish to npm
+      - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
         with:
-          # This expects a script named 'version-packages' in package.json
-          version: npm run version-packages
-          # This expects a script named 'release' in package.json
-          publish: npm run release
+          # This runs 'pnpm ci:publish' only when the PR is merged
+          publish: pnpm ci:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # NOTE: No NPM_TOKEN secret is needed for Trusted Publishing!
+          # The npm CLI (v11.5.1+) automatically detects the OIDC environment.
