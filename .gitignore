@@ -1,0 +1,6 @@
+dist/
+node_modules/
+
+/test/assets/*.png
+/test/assets/*.png.mcmeta
+/test/assets/*.apng
