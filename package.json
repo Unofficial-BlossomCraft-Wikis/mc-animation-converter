@@ -1,7 +1,7 @@
 {
   "name": "@altie122-studios/mc-animation-converter",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Takes .png and .png.mcmeta files and makes a .apng out of them",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -28,7 +28,13 @@
     "release": "changeset publish",
     "ci:publish": "pnpm build && pnpm publish -r --no-git-checks"
   },
-  "keywords": ["minecraft animation", "minecraft", "animation", "png", "apng"],
+  "keywords": [
+    "minecraft animation",
+    "minecraft",
+    "animation",
+    "png",
+    "apng"
+  ],
   "author": "Altie122 Studios, LLC",
   "license": "MIT",
   "packageManager": "pnpm@10.12.4",
