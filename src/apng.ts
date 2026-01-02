@@ -6,14 +6,14 @@ import { getFrames } from "./frames";
  * Configuration for the converter.
  */
 export interface convertToAPNGInput extends ConvertInputType {
-  /**
-   * Override the frame delays in the mcmeta file, in milliseconds.
-   */
-  frameDelayOverride?: number;
-  /**
-   * The tick rate used to calculate the frame delays. Defaults to Minecraft's default tick rate of 20.
-   */
-  minecraftTickSpeed?: number;
+	/**
+	 * Override the frame delays in the mcmeta file, in milliseconds.
+	 */
+	frameDelayOverride?: number;
+	/**
+	 * The tick rate used to calculate the frame delays. Defaults to Minecraft's default tick rate of 20.
+	 */
+	minecraftTickSpeed?: number;
 }
 
 /**
@@ -30,26 +30,26 @@ export interface convertToAPNGInput extends ConvertInputType {
  * @throws {Error} If dimensions are invalid, frames are missing, or buffer data is corrupted.
  */
 export async function convertToAPNG({
-  png,
-  mcmeta,
-  frameDelayOverride = 1,
-  minecraftTickSpeed = 20,
+	png,
+	mcmeta,
+	frameDelayOverride = 1,
+	minecraftTickSpeed = 20,
 }: convertToAPNGInput): Promise<Buffer> {
-  const validatedInput = validateInput({
-    png: png,
-    mcmeta: mcmeta,
-  });
+	const validatedInput = validateInput({
+		png: png,
+		mcmeta: mcmeta,
+	});
 
-  const { frames, size } = await getFrames({
-    png: validatedInput.png,
-    mcmetaJson: validatedInput.mcmetaJson,
-    frameDelayOverride,
-    minecraftTickSpeed,
-  });
+	const { frames, size } = await getFrames({
+		png: validatedInput.png,
+		mcmetaJson: validatedInput.mcmetaJson,
+		frameDelayOverride,
+		minecraftTickSpeed,
+	});
 
-  const finalFrames = frames.map((frame) => frame.buffer);
-  const finalDelays = frames.map((frame) => frame.delay);
-  const output = UPNG.encodeLL(finalFrames, size, size, 3, 1, 8, finalDelays);
+	const finalFrames = frames.map((frame) => frame.buffer);
+	const finalDelays = frames.map((frame) => frame.delay);
+	const output = UPNG.encodeLL(finalFrames, size, size, 3, 1, 8, finalDelays);
 
-  return Buffer.from(output);
+	return Buffer.from(output);
 }

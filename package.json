@@ -1,64 +1,64 @@
 {
-  "name": "@altie122-studios/mc-animation-converter",
-  "private": false,
-  "version": "1.2.0",
-  "description": "Takes .png and .png.mcmeta files and converts them into one of a growing number of animation formats.",
-  "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Unofficial-BlossomCraft-Wikis/MC-animation-converter.git"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "files": [
-    "dist"
-  ],
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  },
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "format": "biome format --write",
-    "version-packages": "changeset version",
-    "release": "pnpm run build && changeset publish",
-    "version": "changeset version && pnpm install --no-frozen-lockfile && pnpm run format",
-    "test": "node test/test.js"
-  },
-  "keywords": [
-    "minecraft animation",
-    "minecraft",
-    "animation",
-    "png",
-    "apng"
-  ],
-  "author": "Altie122 Studios, LLC",
-  "license": "MIT",
-  "packageManager": "pnpm@10.12.4",
-  "engines": {
-    "node": ">=18"
-  },
-  "dependencies": {
-    "gifenc": "^1.0.3",
-    "pako": "^1.0.11",
-    "sharp": "^0.34.5",
-    "zod": "^4.3.4"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.3.10",
-    "@changesets/cli": "^2.29.8",
-    "@types/node": "^22.0.3",
-    "@types/pako": "^2.0.4",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
-  }
+	"name": "@altie122-studios/mc-animation-converter",
+	"private": false,
+	"version": "1.2.0",
+	"description": "Takes .png and .png.mcmeta files and converts them into one of a growing number of animation formats.",
+	"type": "module",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Unofficial-BlossomCraft-Wikis/MC-animation-converter.git"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"publishConfig": {
+		"access": "public",
+		"provenance": true
+	},
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch",
+		"format": "biome format --write",
+		"version-packages": "changeset version",
+		"release": "pnpm run build && changeset publish",
+		"version": "changeset version && pnpm install --no-frozen-lockfile && pnpm run format",
+		"test": "node test/test.js"
+	},
+	"keywords": [
+		"minecraft animation",
+		"minecraft",
+		"animation",
+		"png",
+		"apng"
+	],
+	"author": "Altie122 Studios, LLC",
+	"license": "MIT",
+	"packageManager": "pnpm@10.12.4",
+	"engines": {
+		"node": ">=18"
+	},
+	"dependencies": {
+		"gifenc": "^1.0.3",
+		"pako": "^1.0.11",
+		"sharp": "^0.34.5",
+		"zod": "^4.3.4"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.3.10",
+		"@changesets/cli": "^2.29.8",
+		"@types/node": "^22.0.3",
+		"@types/pako": "^2.0.4",
+		"tsup": "^8.5.1",
+		"typescript": "^5.9.3"
+	}
 }

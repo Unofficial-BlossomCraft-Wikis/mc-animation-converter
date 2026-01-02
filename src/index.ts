@@ -13,26 +13,26 @@ export type AllowedExportTypes = "apng" | "gif";
  * The resulting buffer and metadata of the converted animation.
  */
 export type ConvertOutputType = {
-  export: Buffer;
-  exportType: AllowedExportTypes;
+	export: Buffer;
+	exportType: AllowedExportTypes;
 };
 
 /**
  * Configuration for the converter.
  */
 export interface ConvertInput extends ConvertInputType {
-  /**
-   * The type of export to return. Defaults to "apng". Supports "apng" and "gif".
-   */
-  exportType?: AllowedExportTypes;
-  /**
-   * Override the frame delays in the mcmeta file, in milliseconds.
-   */
-  frameDelayOverride?: number;
-  /**
-   * The tick rate used to calculate the frame delays. Defaults to Minecraft's default tick rate of 20.
-   */
-  minecraftTickSpeed?: number;
+	/**
+	 * The type of export to return. Defaults to "apng". Supports "apng" and "gif".
+	 */
+	exportType?: AllowedExportTypes;
+	/**
+	 * Override the frame delays in the mcmeta file, in milliseconds.
+	 */
+	frameDelayOverride?: number;
+	/**
+	 * The tick rate used to calculate the frame delays. Defaults to Minecraft's default tick rate of 20.
+	 */
+	minecraftTickSpeed?: number;
 }
 
 /**
@@ -50,34 +50,34 @@ export interface ConvertInput extends ConvertInputType {
  * @throws {Error} If dimensions are invalid, frames are missing, or buffer data is corrupted.
  */
 export async function convert({
-  png,
-  mcmeta,
-  exportType = "apng",
-  frameDelayOverride = 1,
-  minecraftTickSpeed = 20,
+	png,
+	mcmeta,
+	exportType = "apng",
+	frameDelayOverride = 1,
+	minecraftTickSpeed = 20,
 }: ConvertInput): Promise<ConvertOutputType | void> {
-  switch (exportType) {
-    case "apng":
-      return {
-        export: await convertToAPNG({
-          png,
-          mcmeta,
-          frameDelayOverride,
-          minecraftTickSpeed,
-        }),
-        exportType,
-      };
-    case "gif":
-      return {
-        export: await convertToGIF({
-          png,
-          mcmeta,
-          frameDelayOverride,
-          minecraftTickSpeed,
-        }),
-        exportType,
-      };
-    default:
-      throw new Error(`Invalid export type: ${exportType}`);  
-  }
+	switch (exportType) {
+		case "apng":
+			return {
+				export: await convertToAPNG({
+					png,
+					mcmeta,
+					frameDelayOverride,
+					minecraftTickSpeed,
+				}),
+				exportType,
+			};
+		case "gif":
+			return {
+				export: await convertToGIF({
+					png,
+					mcmeta,
+					frameDelayOverride,
+					minecraftTickSpeed,
+				}),
+				exportType,
+			};
+		default:
+			throw new Error(`Invalid export type: ${exportType}`);
+	}
 }

@@ -4,197 +4,202 @@ import path from "path";
 import crypto from "crypto";
 
 function getFiles(folder) {
-  const baseDir = path.join(process.cwd(), "test/assets", folder);
-  return {
-    png: fs.readFileSync(path.join(baseDir, "wool_colored_yellow.png")),
-    mcmeta: fs.readFileSync(
-      path.join(baseDir, "wool_colored_yellow.png.mcmeta")
-    ),
-  };
+	const baseDir = path.join(process.cwd(), "test/assets", folder);
+	return {
+		png: fs.readFileSync(path.join(baseDir, "wool_colored_yellow.png")),
+		mcmeta: fs.readFileSync(
+			path.join(baseDir, "wool_colored_yellow.png.mcmeta"),
+		),
+	};
 }
 
 function getBufferHash(buffer) {
-  return crypto.createHash("sha256").update(buffer).digest("hex");
+	return crypto.createHash("sha256").update(buffer).digest("hex");
 }
 
 async function main() {
-  const tests = [
-    {
-      folder: "unorganized_frames",
-      expectedHashes: {
-        apng: "e70aa0bb387bc873adae635fa103c3e253ad60983b5d0c63f1aae6b6bef9a705",
-        gif: "9315e35011b535498806f1d37d8888d4f2fa488c722b27b1d38e885b4d86488b",
-      },
-      receivedHashes: {
-        convertToAPNG: "",
-        convertToGIF: "",
-        convert: { apng: "", gif: "" },
-      },
-      pass: {
-        convertToAPNG: false,
-        convertToGIF: false,
-        convert: {
-          apng: false,
-          gif: false,
-        },
-      },
-    },
-    {
-      folder: "normal",
-      expectedHashes: {
-        apng: "f89ab2c7d39d2868f9540630f98a43fdfea5c3f7232f54dab8b25db1600ebbb2",
-        gif: "b2b6303ac76ebf4fb8b17330933234c7b8e1d1d6e98b6f70ed4cc4667fc8a968",
-      },
-      receivedHashes: {
-        convertToAPNG: "",
-        convertToGIF: "",
-        convert: { apng: "", gif: "" },
-      },
-      pass: {
-        convertToAPNG: false,
-        convertToGIF: false,
-        convert: {
-          apng: false,
-          gif: false,
-        },
-      },
-    },
-    {
-      folder: "custom_delay",
-      expectedHashes: {
-        apng: "1814a61b1cd76e541e845231aa99427d9cac7dea30cfa754f31aab2be1e4fddc",
-        gif: "3f82aabe5bb2965564904c990d9d14f23abcb89285245d80f2604572db07ac03",
-      },
-      receivedHashes: {
-        convertToAPNG: "",
-        convertToGIF: "",
-        convert: { apng: "", gif: "" },
-      },
-      pass: {
-        convertToAPNG: false,
-        convertToGIF: false,
-        convert: {
-          apng: false,
-          gif: false,
-        },
-      },
-    },
-  ];
+	const tests = [
+		{
+			folder: "unorganized_frames",
+			expectedHashes: {
+				apng: "e70aa0bb387bc873adae635fa103c3e253ad60983b5d0c63f1aae6b6bef9a705",
+				gif: "9315e35011b535498806f1d37d8888d4f2fa488c722b27b1d38e885b4d86488b",
+			},
+			receivedHashes: {
+				convertToAPNG: "",
+				convertToGIF: "",
+				convert: { apng: "", gif: "" },
+			},
+			pass: {
+				convertToAPNG: false,
+				convertToGIF: false,
+				convert: {
+					apng: false,
+					gif: false,
+				},
+			},
+		},
+		{
+			folder: "normal",
+			expectedHashes: {
+				apng: "f89ab2c7d39d2868f9540630f98a43fdfea5c3f7232f54dab8b25db1600ebbb2",
+				gif: "b2b6303ac76ebf4fb8b17330933234c7b8e1d1d6e98b6f70ed4cc4667fc8a968",
+			},
+			receivedHashes: {
+				convertToAPNG: "",
+				convertToGIF: "",
+				convert: { apng: "", gif: "" },
+			},
+			pass: {
+				convertToAPNG: false,
+				convertToGIF: false,
+				convert: {
+					apng: false,
+					gif: false,
+				},
+			},
+		},
+		{
+			folder: "custom_delay",
+			expectedHashes: {
+				apng: "1814a61b1cd76e541e845231aa99427d9cac7dea30cfa754f31aab2be1e4fddc",
+				gif: "3f82aabe5bb2965564904c990d9d14f23abcb89285245d80f2604572db07ac03",
+			},
+			receivedHashes: {
+				convertToAPNG: "",
+				convertToGIF: "",
+				convert: { apng: "", gif: "" },
+			},
+			pass: {
+				convertToAPNG: false,
+				convertToGIF: false,
+				convert: {
+					apng: false,
+					gif: false,
+				},
+			},
+		},
+	];
 
-  let pass = true;
+	let pass = true;
 
-  for (const test of tests) {
-    const { png, mcmeta } = getFiles(test.folder);
+	for (const test of tests) {
+		const { png, mcmeta } = getFiles(test.folder);
 
-    // main convert function
-    for (const type of ["apng", "gif"]) {
-      try {
-        const output = await convert({
-          png,
-          mcmeta,
-          exportType: type,
-        });
+		// main convert function
+		for (const type of ["apng", "gif"]) {
+			try {
+				const output = await convert({
+					png,
+					mcmeta,
+					exportType: type,
+				});
 
-        if (output) {
-          const hash = getBufferHash(output.export);
-          test.receivedHashes[type] = hash;
+				if (output) {
+					const hash = getBufferHash(output.export);
+					test.receivedHashes[type] = hash;
 
-          if (test.expectedHashes[type] === hash) {
-            test.pass.convert[type] = true;
-          }
+					if (test.expectedHashes[type] === hash) {
+						test.pass.convert[type] = true;
+					}
 
-          if (test.expectedHashes[type] === "") {
-            console.log(`Skipping ${test.folder}.${type} hash check`);
-            test.pass.convert[type] = "SKIPPED";
-          }
+					if (test.expectedHashes[type] === "") {
+						console.log(`Skipping ${test.folder}.${type} hash check`);
+						test.pass.convert[type] = "SKIPPED";
+					}
 
-          if (test.expectedHashes[type] === "log") {
-            console.log(`${test.folder}.${type} hash: ${hash}`);
-            test.pass.convert[type] = "Hash Logged";
-          }
-        }
-      } catch (err) {
-        console.error(`Error converting ${test.folder}.${type}: ` + err);
-        test.pass.convert[type] = false;
-      }
-    }
+					if (test.expectedHashes[type] === "log") {
+						console.log(`${test.folder}.${type} hash: ${hash}`);
+						test.pass.convert[type] = "Hash Logged";
+					}
+				}
+			} catch (err) {
+				console.error(`Error converting ${test.folder}.${type}: ` + err);
+				test.pass.convert[type] = false;
+			}
+		}
 
-    // convertToAPNG
-    try {
-      const output = await convertToAPNG({
-        png,
-        mcmeta,
-      });
+		// convertToAPNG
+		try {
+			const output = await convertToAPNG({
+				png,
+				mcmeta,
+			});
 
-      if (output) {
-        const hash = getBufferHash(output);
-        test.receivedHashes.convertToAPNG = hash;
+			if (output) {
+				const hash = getBufferHash(output);
+				test.receivedHashes.convertToAPNG = hash;
 
-        if (test.expectedHashes.apng === hash) {
-          test.pass.convertToAPNG = true;
-        }
+				if (test.expectedHashes.apng === hash) {
+					test.pass.convertToAPNG = true;
+				}
 
-        if (test.expectedHashes.apng === "") {
-          console.log(`Skipping ${test.folder}.apng hash check`);
-          test.pass.convertToAPNG = "SKIPPED";
-        }
+				if (test.expectedHashes.apng === "") {
+					console.log(`Skipping ${test.folder}.apng hash check`);
+					test.pass.convertToAPNG = "SKIPPED";
+				}
 
-        if (test.expectedHashes.apng === "log") {
-          console.log(`${test.folder}.apng hash: ${hash}`);
-          test.pass.convertToAPNG = "Hash Logged";
-        }
-      }
-    } catch (err) {
-      console.error(`Error converting ${test.folder}.apng: ` + err);
-      test.pass.convertToAPNG = false;
-    }
+				if (test.expectedHashes.apng === "log") {
+					console.log(`${test.folder}.apng hash: ${hash}`);
+					test.pass.convertToAPNG = "Hash Logged";
+				}
+			}
+		} catch (err) {
+			console.error(`Error converting ${test.folder}.apng: ` + err);
+			test.pass.convertToAPNG = false;
+		}
 
-    // convertToGIF
-    try {
-      const output = await convertToGIF({
-        png,
-        mcmeta,
-      });
+		// convertToGIF
+		try {
+			const output = await convertToGIF({
+				png,
+				mcmeta,
+			});
 
-      if (output) {
-        const hash = getBufferHash(output);
-        test.receivedHashes.convertToGIF = hash;
+			if (output) {
+				const hash = getBufferHash(output);
+				test.receivedHashes.convertToGIF = hash;
 
-        if (test.expectedHashes.gif === hash) {
-          test.pass.convertToGIF = true;
-        }
+				if (test.expectedHashes.gif === hash) {
+					test.pass.convertToGIF = true;
+				}
 
-        if (test.expectedHashes.gif === "") {
-          console.log(`Skipping ${test.folder}.gif hash check`);
-          test.pass.convertToGIF = "SKIPPED";
-        }
+				if (test.expectedHashes.gif === "") {
+					console.log(`Skipping ${test.folder}.gif hash check`);
+					test.pass.convertToGIF = "SKIPPED";
+				}
 
-        if (test.expectedHashes.gif === "log") {
-          console.log(`${test.folder}.gif hash: ${hash}`);
-          test.pass.convertToGIF = "Hash Logged";
-        }
-      }
-    } catch (err) {
-      console.error(`Error converting ${test.folder}.gif: ` + err);
-      test.pass.convertToGIF = false;
-    }
-  }
-  const FinalTestResults = [];
-  for (const test of tests) {
-    if (test.pass.convertToAPNG && test.pass.convertToGIF && test.pass.convert.apng && test.pass.convert.gif) {
-      FinalTestResults.push({
-        folder: test.folder,
-        pass: test.pass,
-      });
-    } else {
-      pass = false;
-      FinalTestResults.push(test);
-    }
-  }
-  console.log("\n--- Final Test Results ---");
-  console.dir(FinalTestResults, { depth: null });
-  console.log(`All Tests Passed: ${pass}`);
-  process.exit(pass ? 0 : 1);
+				if (test.expectedHashes.gif === "log") {
+					console.log(`${test.folder}.gif hash: ${hash}`);
+					test.pass.convertToGIF = "Hash Logged";
+				}
+			}
+		} catch (err) {
+			console.error(`Error converting ${test.folder}.gif: ` + err);
+			test.pass.convertToGIF = false;
+		}
+	}
+	const FinalTestResults = [];
+	for (const test of tests) {
+		if (
+			test.pass.convertToAPNG &&
+			test.pass.convertToGIF &&
+			test.pass.convert.apng &&
+			test.pass.convert.gif
+		) {
+			FinalTestResults.push({
+				folder: test.folder,
+				pass: test.pass,
+			});
+		} else {
+			pass = false;
+			FinalTestResults.push(test);
+		}
+	}
+	console.log("\n--- Final Test Results ---");
+	console.dir(FinalTestResults, { depth: null });
+	console.log(`All Tests Passed: ${pass}`);
+	process.exit(pass ? 0 : 1);
 }
 
 main();
