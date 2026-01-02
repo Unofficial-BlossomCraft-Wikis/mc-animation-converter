@@ -1,5 +1,12 @@
 # @altie122-studios/mc-animation-converter
 
+## 1.2.0
+
+### Minor Changes
+
+- 0c0251f: Feat: Add animation.frames support
+  Feat: Add animation.frames.time support
+
 ## 1.1.0
 
 ### Minor Changes
