@@ -53,3 +53,5 @@ MIT
 
 - [UPNG.js](https://github.com/photopea/UPNG.js) (seen at /src/dep/UPNG.js/UPNG.js)
 - [DefinitelyTyped/upng-js](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/upng-js) (types in the /src/dep/UPNG.js/UPNG.js folder)
+
+Big thanks to [this Minecraft Forum post](https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/resource-packs/resource-pack-discussion/1256350-animation-in-resource-packs-a-minecraft-1-6) for helping make understanding how minecraft animations work way more possible.
