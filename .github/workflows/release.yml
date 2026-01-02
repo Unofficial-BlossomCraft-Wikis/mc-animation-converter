@@ -10,7 +10,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
   contents: write
   pull-requests: write
-  id-token: write # Required for Trusted Publishing (OIDC)
+  id-token: write 
 
 jobs:
   release:
@@ -30,7 +30,6 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
-          # This registry-url is necessary for OIDC to work
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install Dependencies
@@ -40,9 +39,10 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          # This runs 'pnpm ci:publish' only when the PR is merged
           publish: pnpm ci:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # NOTE: No NPM_TOKEN secret is needed for Trusted Publishing!
-          # The npm CLI (v11.5.1+) automatically detects the OIDC environment.
+          # This tells the npm client to use the OIDC token provided by GitHub
+          NPM_CONFIG_PROVENANCE: true
+          # We provide a dummy variable to trigger the registry auth flow
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
