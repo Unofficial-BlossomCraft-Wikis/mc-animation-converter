@@ -10,7 +10,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
   contents: write
   pull-requests: write
-  id-token: write 
+  id-token: write
 
 jobs:
   release:
@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
 
@@ -42,7 +42,3 @@ jobs:
           publish: pnpm ci:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # This tells the npm client to use the OIDC token provided by GitHub
-          NPM_CONFIG_PROVENANCE: true
-          # We provide a dummy variable to trigger the registry auth flow
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
