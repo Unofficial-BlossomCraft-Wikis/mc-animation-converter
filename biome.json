@@ -6,7 +6,13 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"includes": ["**", "!!**/dist"]
+		"includes": [
+			"**",
+			"!!**/dist",
+			"!!**/node_modules",
+			"!!**/test/assets",
+			"**/test/assets/README"
+		]
 	},
 	"formatter": {
 		"enabled": true,
