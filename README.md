@@ -4,17 +4,20 @@ Takes .png and .png.mcmeta files and converts them into one of a growing number 
 
 APNG export is recommended for most use cases, as it is lossless and supports transparency better than GIFs.
 
+## NOTES
+We don't currently support the frames array in the mcmeta file, this is a feature that will be added in a future version.
+
 ## Installation
 
 ```sh
-npm install mc-animation-converter
+npm i @altie122-studios/mc-animation-converter
 ```
 
 ## Usage
 
 ### APNG
 ```ts
-import { convert } from "mc-animation-converter";
+import { convert } from "@altie122-studios/mc-animation-converter";
 
 const input = {
   png: fs.readFileSync("path/to/image.png"),
@@ -28,7 +31,7 @@ fs.writeFileSync("path/to/output.apng", output.export);
 
 ### GIF
 ```ts
-import { convert } from "mc-animation-converter";
+import { convert } from "@altie122-studios/mc-animation-converter";
 
 const input = {
   png: fs.readFileSync("path/to/image.png"),
