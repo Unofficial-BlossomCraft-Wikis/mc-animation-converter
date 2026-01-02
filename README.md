@@ -1,5 +1,8 @@
 # MC animation converter
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Unofficial-BlossomCraft-Wikis/mc-animation-converter/release.yml)![NPM Version](https://img.shields.io/npm/v/%40altie122-studios%2Fmc-animation-converter)![NPM Unpacked Size](https://img.shields.io/npm/unpacked-size/%40altie122-studios%2Fmc-animation-converter)![NPM Last Update](https://img.shields.io/npm/last-update/%40altie122-studios%2Fmc-animation-converter)
+
+
 Takes .png and .png.mcmeta files and converts them into one of a growing number of animation formats.
 
 APNG export is recommended for most use cases, as it is lossless and supports transparency better than GIFs.
