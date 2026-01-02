@@ -1,8 +1,8 @@
-import { ConvertInputType, validateInput } from "./handleBuffers";
-import Sharp from "sharp";
-import UPNG from "./dep/UPNG.js/UPNG.js";
-// @ts-expect-error gifenc has no @types
-import { GIFEncoder, quantize, applyPalette } from "gifenc";
+import { ConvertInputType } from "./handleBuffers";
+export * from "./apng";
+export * from "./gif";
+import { convertToAPNG } from "./apng";
+import { convertToGIF } from "./gif";
 
 /**
  * Supported formats for animation export.
@@ -56,134 +56,28 @@ export async function convert({
   frameDelayOverride = 1,
   minecraftTickSpeed = 20,
 }: ConvertInput): Promise<ConvertOutputType | void> {
-  const validatedInput = validateInput({
-    png: png,
-    mcmeta: mcmeta,
-  });
-
-  const sharp = Sharp(validatedInput.png, { limitInputPixels: false });
-  // Get image metadata
-  const metadata = await sharp.metadata();
-
-  const height = metadata.height;
-  const width = metadata.width;
-  // frame data
-  const frameCount = height / width;
-  // ensure that the frame count is an integer
-  if (frameCount % 1 !== 0) {
-    throw new Error(
-      `Invalid sprite sheet dimensions: height (${height}) must be a multiple of width (${width}).`
-    );
-  }
-  /**
-   * frame duration in ms
-   */
-  const frameDurationBase =
-    validatedInput.mcmetaJson.animation.frametime ?? frameDelayOverride;
-  const minecraftTickSpeedMS = 1000 / minecraftTickSpeed;
-  const frames: ArrayBuffer[] = [];
-  for (let i = 0; i < frameCount; i++) {
-    const top = i * width;
-    const frame = await sharp
-      .clone()
-      .extract({
-        left: 0,
-        top,
-        width: width,
-        height: width,
-      })
-      .raw()
-      .ensureAlpha()
-      .toBuffer();
-    // convert frame to an ArrayBuffer
-    const copy = new Uint8Array(frame.length);
-    copy.set(frame);
-    frames.push(copy.buffer);
-  }
-
-  if (frames.length === 0) {
-    throw new Error("No frames found");
-  }
-
-  for (let i = 0; i < frames.length; i++) {
-    const is_multiple_of_four = frames[i].byteLength % 4 === 0;
-    if (!is_multiple_of_four) {
-      throw new Error("Frame data is not a multiple of four");
-    }
-  }
-
-  const finalFrameOrder: {
-    buffer: ArrayBuffer;
-    delay: number;
-  }[] = [];
-  if (validatedInput.mcmetaJson.animation.frames) {
-    for (const frame of validatedInput.mcmetaJson.animation.frames) {
-      if (typeof frame === "number") {
-        finalFrameOrder.push({
-          buffer: frames[frame],
-          delay: frameDurationBase * minecraftTickSpeedMS,
-        });
-      } else {
-        const index = frame.index;
-        let delay = frame.time ?? frameDurationBase;
-        if (delay <= 0) {
-          delay = 1;
-        }
-        finalFrameOrder.push({
-          buffer: frames[index],
-          delay: delay * minecraftTickSpeedMS,
-        });
-      }
-    }
-  } else {
-    frames.forEach((buffer) => {
-      finalFrameOrder.push({
-        buffer,
-        delay: frameDurationBase * minecraftTickSpeedMS,
-      });
-    });
-  }
-
-  if (exportType === "apng") {
-    const finalFrames = finalFrameOrder.map((frame) => frame.buffer);
-    const finalDelays = finalFrameOrder.map((frame) => frame.delay);
-    const apng = UPNG.encodeLL(finalFrames, width, width, 3, 1, 8, finalDelays);
-
-    const exportBuffer = Buffer.from(apng);
-
-    return {
-      export: exportBuffer,
-      exportType: exportType,
-    };
-  } else if (exportType === "gif") {
-    const rawFrames = finalFrameOrder.map(
-      (frame) => new Uint8Array(frame.buffer)
-    );
-    const gif = GIFEncoder();
-    const allPixels = new Uint8Array(rawFrames.length * rawFrames[0].length);
-    rawFrames.forEach((frame, i) => allPixels.set(frame, i * frame.length));
-    const palette = quantize(allPixels, 256, { format: "rgba4444" });
-    for (const frame of finalFrameOrder) {
-      const rawFrame = new Uint8Array(frame.buffer);
-      const thisFrameDuration = frame.delay;
-      const index = applyPalette(rawFrame, palette, "rgba4444");
-
-      gif.writeFrame(index, width, width, {
-        palette,
-        delay: thisFrameDuration,
-        transparent: true,
-        transparentIndex: Math.max(
-          0,
-          palette.findIndex((p: number[]) => p[3] === 0)
-        ),
-      });
-    }
-
-    gif.finish();
-
-    return {
-      export: Buffer.from(gif.bytes()),
-      exportType: exportType,
-    };
+  switch (exportType) {
+    case "apng":
+      return {
+        export: await convertToAPNG({
+          png,
+          mcmeta,
+          frameDelayOverride,
+          minecraftTickSpeed,
+        }),
+        exportType,
+      };
+    case "gif":
+      return {
+        export: await convertToGIF({
+          png,
+          mcmeta,
+          frameDelayOverride,
+          minecraftTickSpeed,
+        }),
+        exportType,
+      };
+    default:
+      throw new Error(`Invalid export type: ${exportType}`);  
   }
 }
