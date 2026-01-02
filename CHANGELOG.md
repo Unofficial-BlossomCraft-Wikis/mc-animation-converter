@@ -1,5 +1,13 @@
 # @altie122-studios/mc-animation-converter
 
+## 1.3.0
+
+### Minor Changes
+
+- 6c9583d: \- Feat: Added an individual convertToAPNG function
+
+  - Feat: Added an individual convertToGIF function
+
 ## 1.2.0
 
 ### Minor Changes
