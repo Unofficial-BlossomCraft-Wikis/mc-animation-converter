@@ -30,7 +30,8 @@
     "dev": "tsup --watch",
     "version-packages": "changeset version",
     "release": "changeset publish",
-    "ci:publish": "pnpm build && npm publish"
+    "ci:publish": "pnpm build && npm publish",
+    "test": "node test/test.js"
   },
   "keywords": [
     "minecraft animation",

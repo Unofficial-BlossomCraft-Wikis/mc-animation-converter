@@ -1,7 +1,5 @@
 dist/
 node_modules/
 
-/test/assets/*.png
-/test/assets/*.png.mcmeta
-/test/assets/*.apng
-/test/assets/*.gif
+/test/*.apng
+/test/*.gif

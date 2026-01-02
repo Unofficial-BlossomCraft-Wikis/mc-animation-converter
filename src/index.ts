@@ -43,7 +43,7 @@ export interface ConvertInput extends ConvertInputType {
  * @param png - The sprite sheet image as a Buffer.
  * @param mcmeta - The .mcmeta JSON file as a Buffer.
  * @param exportType - The desired output format ("apng" or "gif"). Defaults to "apng".
- * @param frameDelayOverride - Optional override for the duration of each frame in ms.
+ * @param frameDelayOverride - Optional override for the duration of each frame in ms, acts as the base duration and will not override the frametime property in the mcmeta file. (default 1)
  * @param minecraftTickSpeed - Optional tick speed override (default 20).
  *
  * @returns A promise resolving to a ConvertOutputType object containing the exported Buffer.
@@ -53,7 +53,7 @@ export async function convert({
   png,
   mcmeta,
   exportType = "apng",
-  frameDelayOverride,
+  frameDelayOverride = 1,
   minecraftTickSpeed = 20,
 }: ConvertInput): Promise<ConvertOutputType | void> {
   const validatedInput = validateInput({
@@ -79,9 +79,8 @@ export async function convert({
    * frame duration in ms
    */
   const frameDurationBase =
-    frameDelayOverride ?? validatedInput.mcmetaJson.animation.frametime;
-  const minecraftFrameDuration = 1000 / minecraftTickSpeed;
-  const frameDuration = minecraftFrameDuration * frameDurationBase;
+    validatedInput.mcmetaJson.animation.frametime ?? frameDelayOverride;
+  const minecraftTickSpeedMS = 1000 / minecraftTickSpeed;
   const frames: ArrayBuffer[] = [];
   for (let i = 0; i < frameCount; i++) {
     const top = i * width;
@@ -107,21 +106,48 @@ export async function convert({
   }
 
   for (let i = 0; i < frames.length; i++) {
-    console.log(frames[i].byteLength);
     const is_multiple_of_four = frames[i].byteLength % 4 === 0;
     if (!is_multiple_of_four) {
       throw new Error("Frame data is not a multiple of four");
     }
   }
 
-  const frameDelay: number[] = [];
-
-  for (let i = 0; i < frameCount; i++) {
-    frameDelay.push(frameDuration);
+  const finalFrameOrder: {
+    buffer: ArrayBuffer;
+    delay: number;
+  }[] = [];
+  if (validatedInput.mcmetaJson.animation.frames) {
+    for (const frame of validatedInput.mcmetaJson.animation.frames) {
+      if (typeof frame === "number") {
+        finalFrameOrder.push({
+          buffer: frames[frame],
+          delay: frameDurationBase * minecraftTickSpeedMS,
+        });
+      } else {
+        const index = frame.index;
+        let delay = frame.time ?? frameDurationBase;
+        if (delay <= 0) {
+          delay = 1;
+        }
+        finalFrameOrder.push({
+          buffer: frames[index],
+          delay: delay * minecraftTickSpeedMS,
+        });
+      }
+    }
+  } else {
+    frames.forEach((buffer) => {
+      finalFrameOrder.push({
+        buffer,
+        delay: frameDurationBase * minecraftTickSpeedMS,
+      });
+    });
   }
 
   if (exportType === "apng") {
-    const apng = UPNG.encodeLL(frames, width, width, 3, 1, 8, frameDelay);
+    const finalFrames = finalFrameOrder.map((frame) => frame.buffer);
+    const finalDelays = finalFrameOrder.map((frame) => frame.delay);
+    const apng = UPNG.encodeLL(finalFrames, width, width, 3, 1, 8, finalDelays);
 
     const exportBuffer = Buffer.from(apng);
 
@@ -130,17 +156,21 @@ export async function convert({
       exportType: exportType,
     };
   } else if (exportType === "gif") {
-    const rawFrames = frames.map((frame) => new Uint8Array(frame));
+    const rawFrames = finalFrameOrder.map(
+      (frame) => new Uint8Array(frame.buffer)
+    );
     const gif = GIFEncoder();
     const allPixels = new Uint8Array(rawFrames.length * rawFrames[0].length);
     rawFrames.forEach((frame, i) => allPixels.set(frame, i * frame.length));
     const palette = quantize(allPixels, 256, { format: "rgba4444" });
-    for (const frame of rawFrames) {
-      const index = applyPalette(frame, palette, "rgba4444");
+    for (const frame of finalFrameOrder) {
+      const rawFrame = new Uint8Array(frame.buffer);
+      const thisFrameDuration = frame.delay;
+      const index = applyPalette(rawFrame, palette, "rgba4444");
 
       gif.writeFrame(index, width, width, {
         palette,
-        delay: frameDuration,
+        delay: thisFrameDuration,
         transparent: true,
         transparentIndex: Math.max(
           0,

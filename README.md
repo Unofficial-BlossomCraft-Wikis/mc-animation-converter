@@ -4,9 +4,6 @@ Takes .png and .png.mcmeta files and converts them into one of a growing number 
 
 APNG export is recommended for most use cases, as it is lossless and supports transparency better than GIFs.
 
-## NOTES
-We don't currently support the frames array in the mcmeta file, this is a feature that will be added in a future version.
-
 ## Installation
 
 ```sh

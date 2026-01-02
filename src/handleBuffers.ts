@@ -13,7 +13,7 @@ const convertInputSchema = z.object({
 export type ConvertInputType = z.infer<typeof convertInputSchema>;
 
 const McmetaAnimationSchema = z.object({
-  frametime: z.number(),
+  frametime: z.number().optional(),
   frames: z
     .array(
       z.union([
