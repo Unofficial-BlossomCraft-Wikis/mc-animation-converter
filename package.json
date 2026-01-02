@@ -28,8 +28,10 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "format": "biome format --write",
     "version-packages": "changeset version",
-    "ci:publish": "pnpm build && npm publish",
+    "release": "pnpm run build && changeset publish",
+    "version": "changeset version && pnpm install --no-frozen-lockfile && pnpm run format",
     "test": "node test/test.js"
   },
   "keywords": [
@@ -52,6 +54,7 @@
     "zod": "^4.3.4"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.10",
     "@changesets/cli": "^2.29.8",
     "@types/node": "^22.0.3",
     "@types/pako": "^2.0.4",
