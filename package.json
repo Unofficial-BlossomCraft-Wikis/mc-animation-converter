@@ -1,7 +1,7 @@
 {
   "name": "@altie122-studios/mc-animation-converter",
   "private": false,
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Takes .png and .png.mcmeta files and converts them into one of a growing number of animation formats.",
   "type": "module",
   "main": "./dist/index.cjs",
