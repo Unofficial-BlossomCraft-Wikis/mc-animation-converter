@@ -1,5 +1,11 @@
 # @altie122-studios/mc-animation-converter
 
+## 1.3.1
+
+### Patch Changes
+
+- 864fe3a: Fix broken build
+
 ## 1.3.0
 
 ### Minor Changes
