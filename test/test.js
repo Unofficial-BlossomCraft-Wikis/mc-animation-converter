@@ -16,12 +16,32 @@ function main() {
     mcmeta: fs.readFileSync(path.join(dir, `${name}.png.mcmeta`)),
   };
 
-  convert(input).then((output) => {
-    fs.writeFileSync(path.join(dir, `${name}.apng`), output.export);
-  }).catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+  // Test APNG export
+  convert({
+    png: input.png,
+    mcmeta: input.mcmeta,
+    exportType: "apng",
+  })
+    .then((output) => {
+      fs.writeFileSync(path.join(dir, `${name}.apng`), output.export);
+    })
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+  // Test GIF export
+  convert({
+    png: input.png,
+    mcmeta: input.mcmeta,
+    exportType: "gif",
+  })
+    .then((output) => {
+      fs.writeFileSync(path.join(dir, `${name}.gif`), output.export);
+    })
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
 }
 
 main();

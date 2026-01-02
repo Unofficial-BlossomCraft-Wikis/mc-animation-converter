@@ -1,11 +1,13 @@
 import { ConvertInputType, validateInput } from "./handleBuffers";
 import Sharp from "sharp";
 import UPNG from "./dep/UPNG.js/UPNG.js";
+// @ts-expect-error gifenc has no @types
+import { GIFEncoder, quantize, applyPalette } from "gifenc";
 
 /**
  * Supported formats for animation export.
  */
-export type AllowedExportTypes = "apng";
+export type AllowedExportTypes = "apng" | "gif";
 
 /**
  * The resulting buffer and metadata of the converted animation.
@@ -20,7 +22,7 @@ export type ConvertOutputType = {
  */
 export interface ConvertInput extends ConvertInputType {
   /**
-   * The type of export to return. Defaults to "apng"
+   * The type of export to return. Defaults to "apng". Supports "apng" and "gif".
    */
   exportType?: AllowedExportTypes;
   /**
@@ -34,11 +36,13 @@ export interface ConvertInput extends ConvertInputType {
 }
 
 /**
- * Converts a Minecraft sprite sheet (texture + mcmeta) into an animated PNG (APNG).
+ * Converts a Minecraft sprite sheet (texture + mcmeta) into an animation.
+ *
+ * APNG export is recommended for most use cases, as it is lossless and supports transparency better than GIFs.
  *
  * @param png - The sprite sheet image as a Buffer.
  * @param mcmeta - The .mcmeta JSON file as a Buffer.
- * @param exportType - The desired output format (currently only "apng").
+ * @param exportType - The desired output format ("apng" or "gif"). Defaults to "apng".
  * @param frameDelayOverride - Optional override for the duration of each frame in ms.
  * @param minecraftTickSpeed - Optional tick speed override (default 20).
  *
@@ -123,6 +127,32 @@ export async function convert({
 
     return {
       export: exportBuffer,
+      exportType: exportType,
+    };
+  } else if (exportType === "gif") {
+    const rawFrames = frames.map((frame) => new Uint8Array(frame));
+    const gif = GIFEncoder();
+    const allPixels = new Uint8Array(rawFrames.length * rawFrames[0].length);
+    rawFrames.forEach((frame, i) => allPixels.set(frame, i * frame.length));
+    const palette = quantize(allPixels, 256, { format: "rgba4444" });
+    for (const frame of rawFrames) {
+      const index = applyPalette(frame, palette, "rgba4444");
+
+      gif.writeFrame(index, width, width, {
+        palette,
+        delay: frameDuration,
+        transparent: true,
+        transparentIndex: Math.max(
+          0,
+          palette.findIndex((p: number[]) => p[3] === 0)
+        ),
+      });
+    }
+
+    gif.finish();
+
+    return {
+      export: Buffer.from(gif.bytes()),
       exportType: exportType,
     };
   }

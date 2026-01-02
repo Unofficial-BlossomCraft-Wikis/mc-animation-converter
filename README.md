@@ -1,6 +1,8 @@
 # MC animation converter
 
-Takes .png and .png.mcmeta files and makes a .apng out of them
+Takes .png and .png.mcmeta files and converts them into one of a growing number of animation formats.
+
+APNG export is recommended for most use cases, as it is lossless and supports transparency better than GIFs.
 
 ## Installation
 
@@ -10,6 +12,7 @@ npm install mc-animation-converter
 
 ## Usage
 
+### APNG
 ```ts
 import { convert } from "mc-animation-converter";
 
@@ -20,7 +23,24 @@ const input = {
 
 const output = await convert(input);
 
-fs.writeFileSync("path/to/output.apng", output.apng);
+fs.writeFileSync("path/to/output.apng", output.export);
+```
+
+### GIF
+```ts
+import { convert } from "mc-animation-converter";
+
+const input = {
+  png: fs.readFileSync("path/to/image.png"),
+  mcmeta: fs.readFileSync("path/to/image.png.mcmeta"),
+};
+
+const output = await convert({
+  ...input,
+  exportType: "gif",
+});
+
+fs.writeFileSync("path/to/output.gif", output.export);
 ```
 
 working example in /test/test.js
